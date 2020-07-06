@@ -1,42 +1,76 @@
 {
-  "private": true,
-  "description": "Modular framework to teach Puppeteer new tricks.",
+  "name": "puppeteer-extra-plugin-recaptcha",
+  "version": "3.1.10",
+  "description": "A puppeteer-extra plugin to solve reCAPTCHAs automatically.",
+  "main": "dist/index.cjs.js",
+  "module": "dist/index.esm.js",
+  "typings": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
   "repository": "berstend/puppeteer-extra",
+  "homepage": "https://github.com/berstend/puppeteer-extra/tree/master/packages/puppeteer-extra-plugin-recaptcha",
   "author": "berstend",
   "license": "MIT",
-  "main": "packages/puppeteer-extra/index.js",
-  "engines": {
-    "node": ">=8"
-  },
   "scripts": {
-    "bootstrap": "lerna bootstrap",
-    "build": "yarn lerna exec --concurrency 1 'yarn build; echo 0'",
-    "docs": "lerna run docs",
-    "test": "lerna run test",
-    "test-ci": "lerna run test-ci",
-    "prepare": "lerna run prepare",
-    "release": "lerna publish --npm-client npm"
+    "clean": "rm -rf dist/*",
+    "tscheck": "tsc --pretty --noEmit",
+    "build": "yarn clean && tsc --module commonjs && rollup -c rollup.config.ts && yarn ambient-dts",
+    "docs": "exit 0",
+    "docs2": "rm -rf docs/* && typedoc --module commonjs --readme none --target ES6 --theme markdown --excludeNotExported --excludeExternals --excludePrivate --out docs --mode file src/index.ts",
+    "test": "TS_NODE_COMPILER_OPTIONS='{\"module\":\"commonjs\"}' ava -v src/**.test.ts",
+    "test-ci": "yarn build && TS_NODE_COMPILER_OPTIONS='{\"module\":\"commonjs\"}' ava --fail-fast -v dist/*.test.js",
+    "ambient-dts": "yarn ambient-dts-copy && yarn ambient-dts-fix-path",
+    "ambient-dts-copy": "copyfiles -u 1 \"src/**/*.d.ts\" dist",
+    "ambient-dts-fix-path": "replace-in-files --string='/// <reference path=\"../src/' --replacement='/// <reference path=\"../dist/' 'dist/**/*.d.ts'"
   },
-  "workspaces": [
-    "packages/*"
+  "engines": {
+    "node": ">=9.11.2"
+  },
+  "ava": {
+    "compileEnhancements": false,
+    "extensions": [
+      "ts"
+    ],
+    "require": [
+      "ts-node/register"
+    ]
+  },
+  "prettier": {
+    "printWidth": 80,
+    "semi": false,
+    "singleQuote": true
+  },
+  "keywords": [
+    "puppeteer",
+    "puppeteer-extra",
+    "puppeteer-extra-plugin",
+    "recaptcha",
+    "captcha",
+    "2captcha"
   ],
   "devDependencies": {
-    "eslint": "^6.7.1",
-    "eslint-config-prettier": "^6.7.0",
-    "eslint-config-prettier-standard": "^3.0.1",
-    "eslint-config-standard": "^14.1.0",
-    "eslint-plugin-import": "^2.18.2",
-    "eslint-plugin-node": "^10.0.0",
-    "eslint-plugin-prettier": "^3.1.1",
-    "eslint-plugin-promise": "^4.2.1",
-    "eslint-plugin-standard": "^4.0.1",
-    "lerna": "^3.19.0",
-    "lerna-update-wizard": "^0.17.5",
-    "prettier": "^1.19.1",
-    "prettier-config-standard": "^1.0.1"
+    "@types/debug": "^4.1.5",
+    "@types/node": "^13.1.4",
+    "@types/puppeteer": "^2.0.0",
+    "ava": "2.4.0",
+    "copyfiles": "^2.1.1",
+    "puppeteer": "^2.0.0",
+    "puppeteer-extra": "^3.1.9",
+    "replace-in-files-cli": "^0.3.0",
+    "ts-node": "^8.5.4",
+    "tslint": "^5.20.1",
+    "tslint-config-prettier": "^1.18.0",
+    "tslint-config-standard": "^9.0.0",
+    "typescript": "^3.7.4"
   },
-  "resolutions": {
-    "**/fsevents": "^2.1.2"
+  "dependencies": {
+    "debug": "^4.1.1",
+    "merge-deep": "^3.0.2",
+    "puppeteer-extra-plugin": "^3.1.4"
   },
-  "dependencies": {}
+  "peerDependencies": {
+    "puppeteer-extra": "*"
+  },
+  "gitHead": "babb041828cab50c525e0b9aab02d58f73416ef3"
 }
